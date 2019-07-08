@@ -9,7 +9,7 @@ public class TransferPacketHandler {
   public static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
     .named(new ResourceLocation("transfer", "main"))
     .clientAcceptedVersions(NetworkRegistry.ACCEPTVANILLA::equals)
-		.serverAcceptedVersions(NetworkRegistry.ACCEPTVANILLA::equals)
+    .serverAcceptedVersions(NetworkRegistry.ACCEPTVANILLA::equals)
     .networkProtocolVersion(() -> "1")
     .simpleChannel();
 
