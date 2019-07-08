@@ -1,0 +1,14 @@
+modLoader="javafml" #mandatory
+loaderVersion="[26,)"
+#issueTrackerURL="https://github.com/sinkillerj/ProjectE/issues" #optional
+#displayURL="https://github.com/sinkillerj/ProjectE" #optional
+
+[[mods]]
+modId="transfer"
+version="1.0.0"
+authors="JediMasterSoda"
+displayName="Transfer Packet"
+#updateJSONURL="https://raw.githubusercontent.com/sinkillerj/ProjectE/mc1.14.x/update.json"
+description='''
+Adds a transfer packet to Minecraft.
+'''
