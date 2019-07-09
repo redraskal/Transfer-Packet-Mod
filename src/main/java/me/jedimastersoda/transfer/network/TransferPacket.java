@@ -1,60 +1,54 @@
 package me.jedimastersoda.transfer.network;
 
-import java.lang.reflect.Field;
-import java.util.function.Supplier;
+import java.io.UnsupportedEncodingException;
 
-import me.jedimastersoda.transfer.TransferPacketCore;
-import me.jedimastersoda.transfer.utils.ReflectionUtils;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.ConnectingScreen;
-import net.minecraft.client.gui.screen.MainMenuScreen;
-import net.minecraft.client.gui.screen.MultiplayerScreen;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiMultiplayer;
+import net.minecraft.client.multiplayer.GuiConnecting;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class TransferPacket {
+public class TransferPacket implements IMessage {
 
-  public final String ip_address;
+  public String ip_address;
 
-  public TransferPacket(String ip_address) {
-    this.ip_address = ip_address;
+  @Override
+  public void toBytes(ByteBuf buf) {}
+
+  @Override
+  public void fromBytes(ByteBuf buf) {
+    try {
+      this.ip_address = new String(buf.array(), "ASCII");
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
   }
 
-  public static void encode(TransferPacket pkt, PacketBuffer buf) {}
+  public static class Handler implements IMessageHandler<TransferPacket, IMessage> {
 
-  public static TransferPacket decode(PacketBuffer buf) {
-    return new TransferPacket(buf.readString());
-  }
+    @Override
+    public IMessage onMessage(TransferPacket message, MessageContext ctx) {
+      if(message.ip_address == null) return null;
 
-  public static class Handler {
+      Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+        @Override
+        public void run() {
+          ServerData serverData = new ServerData("Transfer", message.ip_address, false);
+          GuiMultiplayer multiplayerScreen = new GuiMultiplayer(new GuiMainMenu());
 
-    public static void handle(TransferPacket message, Supplier<NetworkEvent.Context> ctx) {
-      TransferPacketCore.LOGGER.info("Transferring player to " + message.ip_address);
+          Minecraft.getMinecraft().theWorld.sendQuittingDisconnectingPacket();
 
-      ctx.get().enqueueWork(() -> {
-        ServerData serverData = new ServerData("Transfer", message.ip_address, false);
-        MultiplayerScreen multiplayerScreen = new MultiplayerScreen(new MainMenuScreen());
+          GuiConnecting connectingScreen = new GuiConnecting(multiplayerScreen, Minecraft.getMinecraft(), serverData);
 
-        Minecraft.getInstance().world.sendQuittingDisconnectingPacket();
-
-        ConnectingScreen connectingScreen = new ConnectingScreen(multiplayerScreen, Minecraft.getInstance(),
-            serverData);
-        Field connectingText = ReflectionUtils.getField(ConnectingScreen.class, ITextComponent.class, 0);
-        StringTextComponent stringTextComponent = new StringTextComponent("Transferring server connection...");
-
-        try {
-          ReflectionUtils.modifyPrivateField(connectingText, connectingScreen, stringTextComponent);
-        } catch (Exception e) {
-          e.printStackTrace();
+          Minecraft.getMinecraft().displayGuiScreen(connectingScreen);
         }
-
-        Minecraft.getInstance().displayGuiScreen(connectingScreen);
       });
 
-      ctx.get().setPacketHandled(true);
+      return null;
     }
   }
 }

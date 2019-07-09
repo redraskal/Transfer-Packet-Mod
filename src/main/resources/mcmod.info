@@ -1,0 +1,9 @@
+[{
+  "modid": "transfer",
+  "name": "Transfer Packet",
+  "description": "Adds a transfer packet to Minecraft.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/JediMasterSoda/Transfer-Packet-Mod",
+  "authorList": ["JediMasterSoda"]
+}]
