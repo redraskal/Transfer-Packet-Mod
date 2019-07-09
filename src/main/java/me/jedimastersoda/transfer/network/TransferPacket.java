@@ -1,13 +1,14 @@
 package me.jedimastersoda.transfer.network;
 
-import java.io.UnsupportedEncodingException;
-
 import io.netty.buffer.ByteBuf;
+import me.jedimastersoda.transfer.TransferPacketCore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.multiplayer.GuiConnecting;
+import net.minecraft.client.multiplayer.ServerAddress;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -21,11 +22,7 @@ public class TransferPacket implements IMessage {
 
   @Override
   public void fromBytes(ByteBuf buf) {
-    try {
-      this.ip_address = new String(buf.array(), "ASCII");
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
+    this.ip_address = ByteBufUtils.readUTF8String(buf);
   }
 
   public static class Handler implements IMessageHandler<TransferPacket, IMessage> {
@@ -33,6 +30,8 @@ public class TransferPacket implements IMessage {
     @Override
     public IMessage onMessage(TransferPacket message, MessageContext ctx) {
       if(message.ip_address == null) return null;
+      
+      TransferPacketCore.LOGGER.info("Transferring player to " + message.ip_address);
 
       Minecraft.getMinecraft().addScheduledTask(new Runnable() {
         @Override
@@ -42,9 +41,7 @@ public class TransferPacket implements IMessage {
 
           Minecraft.getMinecraft().theWorld.sendQuittingDisconnectingPacket();
 
-          GuiConnecting connectingScreen = new GuiConnecting(multiplayerScreen, Minecraft.getMinecraft(), serverData);
-
-          Minecraft.getMinecraft().displayGuiScreen(connectingScreen);
+          Minecraft.getMinecraft().displayGuiScreen(new GuiConnecting(multiplayerScreen, Minecraft.getMinecraft(), serverData));
         }
       });
 
