@@ -8,6 +8,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import me.jedimastersoda.transfer.network.TransferPacketHandler;
+
 @Mod(TransferPacketCore.MODID)
 public class TransferPacketCore {
 

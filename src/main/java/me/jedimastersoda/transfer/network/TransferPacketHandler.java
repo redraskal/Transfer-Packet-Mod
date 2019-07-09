@@ -1,4 +1,4 @@
-package me.jedimastersoda.transfer;
+package me.jedimastersoda.transfer.network;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;

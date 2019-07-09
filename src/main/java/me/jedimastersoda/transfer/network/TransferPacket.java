@@ -1,7 +1,8 @@
-package me.jedimastersoda.transfer;
+package me.jedimastersoda.transfer.network;
 
 import java.util.function.Supplier;
 
+import me.jedimastersoda.transfer.TransferPacketCore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ConnectingScreen;
 import net.minecraft.client.gui.screen.MainMenuScreen;
